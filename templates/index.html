@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+    <title>Contrast Adjuster</title>
+</head>
+<body class="bg-gradient-to-br from-red-500 to-yellow-300 min-h-screen flex items-center justify-center">
+    <div class="max-w-lg w-full p-8 rounded-lg shadow-lg bg-white">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">DIP LAB PROJECT</h1>
+            <h2 class="text-2xl text-gray-600">Image Contrast Adjuster</h2>
+        </div>
+        <div class="flex flex-col md:flex-row md:space-x-8">
+            <div class="w-full md:w-1/2">
+                <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+                    <input type="file" name="file" accept="image/*" required class="block w-full px-4 py-2 border border-gray-300 rounded-md">
+                    <label for="contrast" class="block font-semibold text-gray-700">Contrast: <span id="contrast-value" class="font-normal">1.0</span></label>
+                    <input type="range" id="contrast" name="contrast" min="0.1" max="3.0" step="0.1" value="1.0" onchange="updateContrastValue(this.value)" class="block w-full mt-2">
+                    <button type="submit" class="mt-4 px-6 py-3 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300 ease-in-out">Apply Contrast</button>
+                </form>
+            </div>
+            <div class="w-full md:w-1/2 flex justify-center items-center mt-8 md:mt-0">
+                <img id="result-image" src="#" alt="Your Image" style="display:none;" class="max-w-full h-auto rounded-md">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateContrastValue(value) {
+            document.getElementById('contrast-value').innerText = value;
+        }
+
+       document.getElementById('upload-form').onsubmit = async function(event) {
+        event.preventDefault();
+
+        try {
+            var formData = new FormData(this);
+            let response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            let blob = await response.blob();
+            console.log(blob);
+            var img = document.getElementById('result-image');
+            img.src = URL.createObjectURL(blob);
+            img.style.display = 'block';
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+    </script>
+</body>
+</html>
